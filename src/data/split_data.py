@@ -6,7 +6,10 @@ def time_series_split(df):
     """
     
     # Bagi data 90 persent ke train dan 10 persent ke test
-    train = df[['jumlah']][:204]
-    test = df[['jumlah']][204:216]
+    train = df[['jumlah']][:203]
+    test = df[['jumlah']][203:216]
     
-    return train, test
+    train_list = train['jumlah'].tolist()
+    test_list = test['jumlah'].tolist()
+    
+    return train_list, test_list

@@ -2,8 +2,8 @@ import numpy as np
 
 def holt(df, alpha, beta, gamma):
     # Mengambil data 'jumlah' sebagai input dari dataframe
-    data = df['jumlah'].tolist()
-    # print('data training: ',data)
+    data = df
+    
     periode_musim = 12  # Jumlah periode musim (misalnya 12 bulan)
     jumlah_data_uji = len(data)  # Jumlah data uji yang diinginkan
     # print(jumlah_data_uji)
@@ -11,7 +11,7 @@ def holt(df, alpha, beta, gamma):
 
     # Data uji yang dimulai setelah periode musim
     data_uji = data[:jumlah_data_uji]
-    print(f'data training: {data_uji}')
+    # print(f'data training: {data_uji}')
 
     # Menghitung nilai awal untuk level (L), tren (b), dan musiman (S)
     data_awal = data[:periode_musim]
@@ -28,9 +28,9 @@ def holt(df, alpha, beta, gamma):
     musiman = nilai_musiman_awal.copy()
 
     # Debugging nilai awal
-    print("Level awal:", level_awal)
-    print("Tren awal:", tren_awal)
-    print("Musiman awal:", nilai_musiman_awal)
+    # print("Level awal:", level_awal)
+    # print("Tren awal:", tren_awal)
+    # print("Musiman awal:", nilai_musiman_awal)
     temp_musiman = []
 
     # Iterasi untuk menghitung level, tren, dan musiman
@@ -81,6 +81,9 @@ def holt(df, alpha, beta, gamma):
     # Menentukan periode ramalan dan data uji
     periode_uji = data_uji
     ramalan_periode = ramalan[:len(data_uji)]  # Menyesuaikan panjang ramalan dengan data uji
+    hasil_clear = [float(x) for x in ramalan_periode]
+    # print(hasil_clear)
+
 
     # Melakukan prediksi ke depan sebanyak jumlah_prediksi periode
     prediksi_ke_depan = []
@@ -90,5 +93,5 @@ def holt(df, alpha, beta, gamma):
         prediksi = round(L * S)
         prediksi_ke_depan.append(prediksi)
 
-    return periode_uji, ramalan_periode, prediksi_ke_depan
+    return periode_uji, hasil_clear, prediksi_ke_depan
 

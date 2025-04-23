@@ -2,9 +2,13 @@ import random
 from .holt_winters import holt
 from .evaluate import MAPE
 
+import sys
+sys.set_int_max_str_digits(10240)
+
+
 def to_binary(value, num_bits=10):
     # Mengalikan nilai dengan 1000 dan mengubahnya menjadi integer
-    scaled_value = int(value * (2**num_bits))  
+    scaled_value = int(value * (2** num_bits))  
     # Mengubah integer menjadi representasi biner
     return bin(scaled_value)[2:].zfill(num_bits) 
 
@@ -32,7 +36,7 @@ def pembentukan_populasi_awal(jumlahKromosom):
     return biner
 
 # Fungsi evaluasi_fitness tanpa print yang tidak diperlukan
-def evaluasi_fitness(populasi, df):
+def evaluasi_fitness(populasi, train, test):
     evaluasi_fitness = []
     
     for i, individu in enumerate(populasi):
@@ -47,13 +51,15 @@ def evaluasi_fitness(populasi, df):
         gamma = to_decimal(gamma_biner)
         
         # Menggunakan nilai alpha, beta, gamma untuk melakukan peramalan
-        _, hasil_ramalan, _ = holt(df, alpha, beta, gamma)
-
-        # Data uji untuk menghitung fitness
-        data_uji = df['jumlah'][204:].tolist()
-
+        _, hasil_ramalan, _ = holt(train, alpha, beta, gamma)
+        
         # Hitung fitness berdasarkan MAPE
-        individu['Fitness'] = MAPE(data_uji, hasil_ramalan)
+        individu['Fitness'] = MAPE(test, hasil_ramalan)
+        
+        # Ubah ke biner lagi
+        alpha = to_binary(alpha)
+        beta = to_binary(beta)
+        gamma = to_binary(gamma)
 
         # Menyusun hasil evaluasi fitness untuk individu
         evaluasi_fitness.append({
@@ -100,7 +106,7 @@ def RouletteWhell(populasi):
         if r1 <= cumulative_probability:
             return populasi[i]
 
-def mutasi2(df, populasi):
+def mutasi2(train, test, populasi):
     # Ubah bilangan menjadi biner
     # parents1 = {
     #     'Alpha': to_binary(populasi['Alpha']),
@@ -110,19 +116,19 @@ def mutasi2(df, populasi):
 
     # Gabungkan biner
     parents1 = populasi['Alpha'] + populasi['Beta'] + populasi['Gamma']
-    print('mutasi sebelum di proses: ',parents1)
+    # print('mutasi sebelum di proses: ',parents1)
     
     point1, point2 = sorted(random.sample(range(len(parents1)), 2))
-    print('Titik potong', point1, point2)
+    # print('Titik potong', point1, point2)
 
     
     # Balikkan segmen yang diinginkan
     reversed_segment = parents1[point1:point2][::-1]
-    print('reverse: ',reversed_segment, point1, point2)
-    print('parents1[point1:point2]: ',parents1[point1:point2])
+    # print('reverse: ',reversed_segment, point1, point2)
+    # print('parents1[point1:point2]: ',parents1[point1:point2])
     # Gabungkan kembali segmen-segmen menjadi child1
     child1 = parents1[:point1] + reversed_segment + parents1[point2:]
-    print('gabung anak mutasi: ',child1)
+    # print('gabung anak mutasi: ',child1)
     # kromosom_reversed = parents1[::-1]  # Membalik string
     # print(kromosom_reversed)
 
@@ -140,10 +146,9 @@ def mutasi2(df, populasi):
     child1['Gamma'] = to_decimal(child1['Gamma'])
 
     # Hitung nilai fitness menggunakan Holt dan MAPE
-    _, hasil_ramalan_child1, _ = holt(df, child1['Alpha'], child1['Beta'], child1['Gamma'])
+    _, hasil_ramalan_child1, _ = holt(train, child1['Alpha'], child1['Beta'], child1['Gamma'])
     
-    data_uji = df['jumlah'][204:].tolist()
-    child1['Fitness'] = MAPE(data_uji, hasil_ramalan_child1)
+    child1['Fitness'] = MAPE(test, hasil_ramalan_child1)
 
     # ubah ke biner lagi
     child1['Alpha'] = to_binary(child1['Alpha'])
@@ -157,8 +162,10 @@ def mutasi2(df, populasi):
         'Fitness': child1['Fitness']
     }
 
-def crossover(df, parents1, parents2):
+def crossover(train, test, parents1, parents2):
     # Ubah bilangan menjadi biner
+    print(parents1)
+    print(parents2)
     parents1 = {
         'Alpha': to_binary(parents1['Alpha']),
         'Beta': to_binary(parents1['Beta']),
@@ -196,6 +203,7 @@ def crossover(df, parents1, parents2):
         'Gamma': bagian1_child2[20:30],
         'Fitness': None
     }
+    
 
     # Mengubah biner ke desimal
     child1['Alpha'] = to_decimal(child1['Alpha'])
@@ -206,12 +214,11 @@ def crossover(df, parents1, parents2):
     child2['Beta'] = to_decimal(child2['Beta'])
     child2['Gamma'] = to_decimal(child2['Gamma'])
 
-    _, hasil_ramalan_child1, _ = holt(df, child1['Alpha'], child1['Beta'], child1['Gamma'])
-    _, hasil_ramalan_child2, _ = holt(df, child2['Alpha'], child2['Beta'], child2['Gamma'])
+    _, hasil_ramalan_child1, _ = holt(train, child1['Alpha'], child1['Beta'], child1['Gamma'])
+    _, hasil_ramalan_child2, _ = holt(train, child2['Alpha'], child2['Beta'], child2['Gamma'])
     
-    data_uji = df['jumlah'][204:].tolist()
-    child1['Fitness'] = MAPE(data_uji, hasil_ramalan_child1)
-    child2['Fitness'] = MAPE(data_uji, hasil_ramalan_child2)
+    child1['Fitness'] = MAPE(test, hasil_ramalan_child1)
+    child2['Fitness'] = MAPE(test, hasil_ramalan_child2)
 
     # Mengubah ke biner lagi
     child1['Alpha'] = to_binary(child1['Alpha'])
@@ -255,7 +262,7 @@ def crossover(df, parents1, parents2):
     #     'Fitness': child2['Fitness']
     # }
 
-def algoritma_genetika6(df, jumlahKromosom, generations, probability):
+def algoritma_genetika6(train, test,  jumlahKromosom, generations, probability):
     no_improvement_count = 0
     best_fitness_overall = float('inf')  # Inisialisasi dengan nilai fitness maksimum
     fitness_history = []
@@ -268,11 +275,15 @@ def algoritma_genetika6(df, jumlahKromosom, generations, probability):
         print(f"\nIterasi ke-{generasi + 1}")
 
         # Evaluasi fitness populasi
-        fitness_values = evaluasi_fitness(populasi, df)
+        print(f"Populasi: {populasi}")
+        fitness_values = evaluasi_fitness(populasi, train, test)
         print(f'Fitness values: ', fitness_values)
+        
+        # Mengambil hanya fitness yang lebih besar dari 0
+        fitness_values_positive = [individu for individu in fitness_values if individu['Fitness'] > 0]
 
         # Cari individu terbaik dalam populasi saat ini
-        best_individu_generasi = min(populasi, key=lambda x: x['Fitness'])
+        best_individu_generasi = min(fitness_values_positive, key=lambda x: x['Fitness'])
         print(f'best individu generasi ke-{generasi + 1}: {best_individu_generasi}')
 
         # Tambahkan fitness terbaik ke dalam history
@@ -306,7 +317,7 @@ def algoritma_genetika6(df, jumlahKromosom, generations, probability):
             populasi = elite_individuals + pembentukan_populasi_awal(jumlahKromosom - len(elite_individuals))
             
             # Evaluasi kembali fitness populasi setelah perubahan
-            fitness_values = evaluasi_fitness(populasi, df)
+            fitness_values = evaluasi_fitness(populasi, train, test)
 
             # Reset penghitung no improvement
             no_improvement_count = 0
@@ -326,18 +337,18 @@ def algoritma_genetika6(df, jumlahKromosom, generations, probability):
             parent2 = RouletteWhell(fitness_values)  # Pilih induk kedua
  
             # Crossover: Menggabungkan dua induk untuk menghasilkan dua keturunan
-            offspring1, offspring2 = crossover(parent1, parent2)
+            offspring1, offspring2 = crossover(train, test, parent1, parent2)
 
             # Mutasi: Memodifikasi gen keturunan secara acak berdasarkan probabilitas tertentu
             if generasi % probability == 0:  # Jika generasi memenuhi syarat probabilitas untuk mutasi
-                offspring1 = mutasi2(offspring1)
-                offspring2 = mutasi2(offspring2)
+                offspring1 = mutasi2(train, test, offspring1)
+                offspring2 = mutasi2(train, test, offspring2)
 
             # Evaluasi fitness keturunan baru
-            fitness_values_offspring = evaluasi_fitness([offspring1, offspring2], df)
-            print(fitness_values_offspring)
-            print('offspring1: ',offspring1)
-            print('offspring2: ',offspring2)
+            fitness_values_offspring = evaluasi_fitness([offspring1, offspring2], train, test)
+            # print(fitness_values_offspring)
+            # print('offspring1: ',offspring1)
+            # print('offspring2: ',offspring2)
             # Tambahkan keturunan ke populasi baru
             new_populasi.extend([offspring1, offspring2])
             
