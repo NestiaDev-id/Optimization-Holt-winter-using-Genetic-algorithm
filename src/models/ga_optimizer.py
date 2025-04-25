@@ -266,15 +266,16 @@ def algoritma_genetika6(train, test,  jumlahKromosom, generations, probability):
     no_improvement_count = 0
     best_fitness_overall = float('inf')
     fitness_history = []
-    new_populasi = []
-
+    
 
     # Membentuk populasi awal
     populasi = pembentukan_populasi_awal(jumlahKromosom)
     print(f'Pembentukan populasi awal: ', populasi)
-
-    for generasi in range(generations):
+        
+    for generasi in range(1, generations + 1):
         print(f"\nIterasi ke-{generasi + 1}")
+        new_populasi = []
+        gabung_populasi = []
 
         # Evaluasi fitness populasi
         print(f"Populasi: {populasi}")
@@ -282,53 +283,65 @@ def algoritma_genetika6(train, test,  jumlahKromosom, generations, probability):
         print(f'Fitness values: ', hitung_nilai_fitness_awal)
         
         # Mutasi: Memodifikasi gen keturunan secara acak berdasarkan probabilitas tertentu
-        while len(new_populasi) < len(populasi):
+        if len(new_populasi) < len(populasi):
             if generasi % probability == 0:  # Jika generasi memenuhi syarat probabilitas untuk mutasi
                 parent1 = RouletteWhell(hitung_nilai_fitness_awal)
                 offspring1 = mutasi2(train, test, parent1)
                 fitness_values_offspring = evaluasi_fitness([offspring1], train, test)
+                # print('Daftar dari offspring mutasi : ', fitness_values_offspring)
+                # print('Masuk mutasi')
                 new_populasi.append(offspring1)
-            else:
+            elif generasi % probability != 0:
                 parent1 = RouletteWhell(hitung_nilai_fitness_awal)  # Pilih induk pertama
                 parent2 = RouletteWhell(hitung_nilai_fitness_awal)  # Pilih induk kedua
                 # Crossover: Menggabungkan dua induk untuk menghasilkan dua keturunan
                 offspring1, offspring2 = crossover(train, test, parent1, parent2)
                 fitness_values_offspring = evaluasi_fitness([offspring1, offspring2], train, test)
+                # print("Daftar dari offspring crossofer: ", evaluasi_fitness([offspring1, offspring2], train, test))
                 new_populasi.extend(fitness_values_offspring)
+                # print('masuk crossover')
         print("Daftar new populasi: ", new_populasi)
         
-        # Mengambil hanya fitness yang lebih besar dari 0
-        fitness_values_positive = [individu for individu in new_populasi if individu['Fitness'] > 0]
-        print(f"Daftar fitness setelah filter: ", fitness_values_positive)
-
-        if fitness_values_positive:
-           # Urutkan offspring dari yang paling fit (kecil) ke paling buruk (besar)
-            fitness_values_positive.sort(key=lambda x: x['Fitness'])
-
-            # Urutkan populasi dari yang paling buruk (negatif dulu, lalu positif terbesar)
-            populasi_sorted = sorted(populasi, key=lambda x: (x['Fitness'] > 0, x['Fitness']), reverse=False)
+        gabung_populasi = populasi + new_populasi 
         
-            jumlah_pengganti = min(len(fitness_values_positive), len(populasi_sorted))
+        gabung_populasi.sort(key=lambda x: x['Fitness'])
+        
+        # buang kromosom dengan fitness negatif
+        gabung_populasi = [individu for individu in gabung_populasi if individu['Fitness'] > 0]
+        
+        populasi = gabung_populasi[:jumlahKromosom]
+       
+        
+        
 
-            for i in range(jumlah_pengganti):
-                indeks_asli = populasi.index(populasi_sorted[i])
-                # print(f"🔁 Mengganti individu index {indeks_asli} dengan fitness {populasi_sorted[i]['Fitness']} → {fitness_values_positive[i]['Fitness']}")
-                populasi[indeks_asli] = fitness_values_positive[i]
+        # if fitness_values_positive:
+        #    # Urutkan offspring dari yang paling fit (kecil) ke paling buruk (besar)
+        #     fitness_values_positive.sort(key=lambda x: x['Fitness'])
+
+        #     # Urutkan populasi dari yang paling buruk (negatif dulu, lalu positif terbesar)
+        #     populasi_sorted = sorted(populasi, key=lambda x: (x['Fitness'] > 0, x['Fitness']), reverse=False)
+        
+        #     jumlah_pengganti = min(len(fitness_values_positive), len(populasi_sorted))
+
+        #     for i in range(jumlah_pengganti):
+        #         indeks_asli = populasi.index(populasi_sorted[i])
+        #         print(f"🔁 Mengganti individu index {indeks_asli} dengan fitness {populasi_sorted[i]['Fitness']} → {fitness_values_positive[i]['Fitness']}")
+        #         populasi[indeks_asli] = fitness_values_positive[i]
                 
-            # Cek apakah semua fitness di populasi bernilai positif
-            semua_fitness_positif = all(individu['Fitness'] > 0 for individu in populasi)
+        #     # Cek apakah semua fitness di populasi bernilai positif
+        #     semua_fitness_positif = all(individu['Fitness'] > 0 for individu in populasi)
 
-            if semua_fitness_positif:
-                # Ganti individu dengan fitness terbesar dengan yang terbaik dari new_populasi (fitness terkecil)
-                populasi_terburuk = max(populasi, key=lambda x: x['Fitness'])
-                terbaik_baru = fitness_values_positive[0]  # Karena sudah di-sort
+        #     if semua_fitness_positif:
+        #         # Ganti individu dengan fitness terbesar dengan yang terbaik dari new_populasi (fitness terkecil)
+        #         populasi_terburuk = max(populasi, key=lambda x: x['Fitness'])
+        #         terbaik_baru = fitness_values_positive[0]  # Karena sudah di-sort
 
-                indeks_terburuk = populasi.index(populasi_terburuk)
-                populasi[indeks_terburuk] = terbaik_baru
-                # print(f"🔁 Semua fitness positif. Mengganti individu terburuk dengan yang terbaik dari offspring.")
+        #         indeks_terburuk = populasi.index(populasi_terburuk)
+        #         populasi[indeks_terburuk] = terbaik_baru
+        #         print(f"🔁 Semua fitness positif. Mengganti individu terburuk dengan yang terbaik dari offspring.")
                         
-        else:
-            print("⚠️ Tidak ada individu dengan fitness > 0 dari hasil offspring. Tidak dilakukan penggantian.")
+        # else:
+        #     print("⚠️ Tidak ada individu dengan fitness > 0 dari hasil offspring. Tidak dilakukan penggantian.")
 
 
                 
