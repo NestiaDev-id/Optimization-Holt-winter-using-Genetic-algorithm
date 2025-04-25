@@ -265,6 +265,7 @@ def crossover(train, test, parents1, parents2):
 def algoritma_genetika6(train, test,  jumlahKromosom, generations, probability):
     no_improvement_count = 0
     best_fitness_overall = float('inf')
+    best_individu_overall = float('inf')
     fitness_history = []
     
 
@@ -273,25 +274,25 @@ def algoritma_genetika6(train, test,  jumlahKromosom, generations, probability):
     print(f'Pembentukan populasi awal: ', populasi)
         
     for generasi in range(1, generations + 1):
-        print(f"\nIterasi ke-{generasi + 1}")
+        print(f"\nIterasi ke-{generasi}")
         new_populasi = []
         gabung_populasi = []
 
         # Evaluasi fitness populasi
         print(f"Populasi: {populasi}")
         hitung_nilai_fitness_awal = evaluasi_fitness(populasi, train, test)
-        print(f'Fitness values: ', hitung_nilai_fitness_awal)
+        # print(f'Fitness values: ', hitung_nilai_fitness_awal)
         
-        # Mutasi: Memodifikasi gen keturunan secara acak berdasarkan probabilitas tertentu
+        # Mutasi atau crossover tergantung probabilitas
         if len(new_populasi) < len(populasi):
-            if generasi % probability == 0:  # Jika generasi memenuhi syarat probabilitas untuk mutasi
+            if generasi % probability == 0:  # Mutasi
                 parent1 = RouletteWhell(hitung_nilai_fitness_awal)
                 offspring1 = mutasi2(train, test, parent1)
                 fitness_values_offspring = evaluasi_fitness([offspring1], train, test)
                 # print('Daftar dari offspring mutasi : ', fitness_values_offspring)
                 # print('Masuk mutasi')
                 new_populasi.append(offspring1)
-            elif generasi % probability != 0:
+            else:  # Crossover
                 parent1 = RouletteWhell(hitung_nilai_fitness_awal)  # Pilih induk pertama
                 parent2 = RouletteWhell(hitung_nilai_fitness_awal)  # Pilih induk kedua
                 # Crossover: Menggabungkan dua induk untuk menghasilkan dua keturunan
@@ -299,19 +300,40 @@ def algoritma_genetika6(train, test,  jumlahKromosom, generations, probability):
                 fitness_values_offspring = evaluasi_fitness([offspring1, offspring2], train, test)
                 # print("Daftar dari offspring crossofer: ", evaluasi_fitness([offspring1, offspring2], train, test))
                 new_populasi.extend(fitness_values_offspring)
-                # print('masuk crossover')
-        print("Daftar new populasi: ", new_populasi)
-        
-        gabung_populasi = populasi + new_populasi 
-        
-        gabung_populasi.sort(key=lambda x: x['Fitness'])
-        
-        # buang kromosom dengan fitness negatif
-        gabung_populasi = [individu for individu in gabung_populasi if individu['Fitness'] > 0]
-        
+
+        # Cek individu terbaik di generasi ini
+        best_individu_generasi = min(new_populasi, key=lambda x: x['Fitness'])
+
+        # Update best fitness global
+        if best_individu_generasi['Fitness'] < best_fitness_overall:
+            best_fitness_overall = best_individu_generasi['Fitness']
+            no_improvement_count = 0
+        else:
+            no_improvement_count += 1
+
+        # Hapus dan tambahkan individu baru jika tidak ada perbaikan
+        if no_improvement_count >= 5:
+            print("Tidak ada perbaikan, menghapus individu dan menambahkan individu secara acak.")
+
+            # Elitisme - simpan top individu
+            sorted_populasi = sorted(populasi, key=lambda x: x['Fitness'])
+            size_elite = int(jumlahKromosom * 0.3)  # Simpan 30% terbaik
+            elite_individuals = sorted_populasi[:size_elite]
+
+            # Tambah individu acak baru
+            individu_baru = pembentukan_populasi_awal(jumlahKromosom - size_elite)
+
+            # Update populasi
+            populasi = elite_individuals + individu_baru
+
+            # Reset penghitung
+            no_improvement_count = 0
+
+        # Gabung populasi lama dengan individu baru dari mutasi/crossover
+        gabung_populasi = populasi + new_populasi
         populasi = gabung_populasi[:jumlahKromosom]
-       
-        
+
+    # Simpan fitness history    
         
 
         # if fitness_values_positive:
@@ -349,6 +371,8 @@ def algoritma_genetika6(train, test,  jumlahKromosom, generations, probability):
         # Jika jumlah individu dalam new_populasi lebih dari jumlahKromosom, kelebihannya akan dibuang.
         # populasi = new_populasi[:jumlahKromosom]
     print(f"berikut daftar populasi",populasi)
+    
+    populasi = evaluasi_fitness(populasi, train, test)
     
     individu_fitness_min = min(populasi, key=lambda x: x['Fitness'])
     print("Individu dengan fitness minimum:", individu_fitness_min)
