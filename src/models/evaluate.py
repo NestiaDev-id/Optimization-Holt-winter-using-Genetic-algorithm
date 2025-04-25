@@ -17,6 +17,6 @@ def MAPE_setiap_periode(data_test, hasil_ramalan):
     for i in range(len(data_test)):
         mape_periode = abs(data_test[i] - hasil_ramalan[i]) / data_test[i] * 100
         mape_per_periode.append(mape_periode)
-    print(f"  Periode {i}: {mape_per_periode}%")
+    # print(f"  Periode {i}: {mape_per_periode}%")
 
     return mape_per_periode
