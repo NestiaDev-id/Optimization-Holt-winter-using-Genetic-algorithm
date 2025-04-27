@@ -23,22 +23,24 @@ def predict_passenger(input_data: PredictionInput):
     train, test = time_series_split(df_cleaned)
 
     # Genetic Algorithm optimization
-    best_individu, _, _ = algoritma_genetika6(train, test, 
+    individu_fitness_min, _, _ = algoritma_genetika6(train, test, 
                                               input_data.population_size,
                                               input_data.generations,
                                               input_data.mutation_prob)
-    alpha = to_decimal(best_individu["Alpha"])
-    beta = to_decimal(best_individu["Beta"])
-    gamma = to_decimal(best_individu["Gamma"])
+    alpha = to_decimal(individu_fitness_min["Alpha"])
+    beta = to_decimal(individu_fitness_min["Beta"])
+    gamma = to_decimal(individu_fitness_min["Gamma"])
 
     # Holt-Winters Forecasting
     _, ramalan_periode, _ = holt(train, alpha, beta, gamma)
+    
 
     # Calculate MAPE
     mape_score = MAPE(test, ramalan_periode)
+    
 
     return PredictionResult(
-        forecast=ramalan_periode.tolist(),
+        forecast=ramalan_periode,
         mape=mape_score,
         best_alpha=alpha,
         best_beta=beta,
