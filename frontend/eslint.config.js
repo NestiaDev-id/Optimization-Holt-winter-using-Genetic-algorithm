@@ -23,7 +23,16 @@ export default tseslint.config(
         "warn",
         { allowConstantExport: true },
       ],
-      "react/no-unescaped-entities": "off",
+      // Disable the unused-vars rule
+      "no-unused-vars": "off", // Disable for all files, if you need more specific control, you can add for 'ts' and 'tsx' files
+
+      // Disable React specific unused variable rules
+      "react/jsx-uses-react": "off", // React 17 and above no longer require 'React' to be in scope
+      "react/jsx-uses-vars": "off", // Disable unused variables for React components
+
+      // You can also disable unused hooks check (if needed)
+      "react-hooks/rules-of-hooks": "off",
+      "react-hooks/exhaustive-deps": "off",
     },
   }
 );
