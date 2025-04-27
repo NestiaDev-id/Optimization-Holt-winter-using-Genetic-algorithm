@@ -8,7 +8,12 @@ app = FastAPI(
     version="0.1.0",
 )
 
-app.include_router(endpoints.router)
+app.include_router(endpoints.router, prefix="/api")
+
+# Add a root endpoint to handle requests to '/'
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to My ML API!"}
 
 if __name__ == "__main__":
     import uvicorn

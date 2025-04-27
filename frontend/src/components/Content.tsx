@@ -68,7 +68,6 @@ export default function Content() {
     <div className="container mx-auto mt-6 flex flex-col gap-6">
       <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Chart (Nomor 3) */}
-
         <Card>
           <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
             <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6 xl:text-center">
