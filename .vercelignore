@@ -1,0 +1,29 @@
+# Ignore model files (pkl, h5, dll) yang besar
+
+_.pkl
+_.h5
+
+# Ignore data file yang besar
+
+notebooks/
+data/
+
+# Ignore virtual environment (pastikan kamu tidak meng-upload venv)
+
+venv/
+\*venv
+
+# Ignore temporary files atau file cache
+
+_.log
+_.tmp
+_.bak
+_.swp
+
+# Ignore Excel files (jika tidak perlu di-upload)
+
+\*.xlsx
+
+# Ignore .git directory
+
+.git/
