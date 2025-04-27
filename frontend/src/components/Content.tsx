@@ -88,7 +88,7 @@ export default function Content() {
         dataset: [], // Kirim dataset sebagai array kosong jika memang kosong
       };
 
-      const response = await fetch("/api/predict", {
+      const response = await fetch(`${backendUrl}/api/predict`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
