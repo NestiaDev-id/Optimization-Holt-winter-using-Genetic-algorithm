@@ -7,11 +7,11 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
-import React, { useState, useTransition } from "react";
+// import { Textarea } from "@/components/ui/textarea";
+// import { Progress } from "@/components/ui/progress";
+import React, { useState } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 import {
   ChartConfig,
   ChartContainer,
@@ -19,7 +19,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Button } from "./ui/button";
-import { sendData } from "@/utils/store";
+// import { sendData } from "@/utils/store";
 import {
   Table,
   TableBody,
@@ -30,21 +30,21 @@ import {
 } from "@/components/ui/table"; // pastikan ini sudah ada ya
 import { Loader2 } from "lucide-react"; // import icon spinner
 
-const chartData = [
-  { month: "Jan", national: 4000, international: 2400 },
-  { month: "Feb", national: 3000, international: 1398 },
-  { month: "Mar", national: 2000, international: 9800 },
-  { month: "Apr", national: 2780, international: 3908 },
-  { month: "May", national: 1890, international: 4800 },
-  { month: "Jun", national: 2390, international: 3800 },
-  { month: "Jul", national: 2390, international: 3800 },
-  { month: "Aug", national: 2390, international: 3800 },
-  { month: "Sep", national: 2390, international: 3800 },
-  { month: "Nov", national: 2390, international: 3800 },
-  { month: "Dec", national: 2390, international: 3800 },
-];
+// const chartData = [
+//   { month: "Jan", national: 4000, international: 2400 },
+//   { month: "Feb", national: 3000, international: 1398 },
+//   { month: "Mar", national: 2000, international: 9800 },
+//   { month: "Apr", national: 2780, international: 3908 },
+//   { month: "May", national: 1890, international: 4800 },
+//   { month: "Jun", national: 2390, international: 3800 },
+//   { month: "Jul", national: 2390, international: 3800 },
+//   { month: "Aug", national: 2390, international: 3800 },
+//   { month: "Sep", national: 2390, international: 3800 },
+//   { month: "Nov", national: 2390, international: 3800 },
+//   { month: "Dec", national: 2390, international: 3800 },
+// ];
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+// const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const chartConfig = {
   views: {
@@ -67,18 +67,23 @@ export default function Content() {
   const [forecastData, setForecastData] = useState<any[]>([]);
   const [isPending, setIsPending] = useState(false);
 
-  const [result, setResult] = useState<Record<string, unknown> | null>(null);
+  const [result, setResult] = useState<{
+    mape?: number;
+    best_alpha?: number;
+    best_beta?: number;
+    best_gamma?: number;
+  } | null>(null);
 
-  const total = React.useMemo(
-    () => ({
-      national: chartData.reduce((acc, curr) => acc + curr.national, 0),
-      international: chartData.reduce(
-        (acc, curr) => acc + curr.international,
-        0
-      ),
-    }),
-    []
-  );
+  // const total = React.useMemo(
+  //   () => ({
+  //     national: chartData.reduce((acc, curr) => acc + curr.national, 0),
+  //     international: chartData.reduce(
+  //       (acc, curr) => acc + curr.international,
+  //       0
+  //     ),
+  //   }),
+  //   []
+  // );
 
   const formatNumber = (num: number) => {
     if (num >= 1_000_000) {
@@ -203,7 +208,7 @@ export default function Content() {
               config={{
                 views: forecastData.map((data) => ({
                   label: data.month,
-                  value: data.national,
+                  color: chartConfig.national.color, // Add a valid color property
                 })),
               }}
               className="aspect-auto h-[250px] w-full"
@@ -309,25 +314,35 @@ export default function Content() {
                 <div className="flex justify-between">
                   <Label>MAPE (Error):</Label>
                   <span className="font-bold text-primary">
-                    {result?.mape?.toFixed(2)}%
+                    {typeof result?.mape === "number"
+                      ? result.mape.toFixed(2)
+                      : "N/A"}
+                    %
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <Label>Best Alpha:</Label>
                   <span className="font-bold text-primary">
-                    {result?.best_alpha?.toFixed(4)}
+                    {typeof result?.mape === "number"
+                      ? result.mape.toFixed(2)
+                      : "N/A"}
+                    %
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <Label>Best Beta:</Label>
                   <span className="font-bold text-primary">
-                    {result?.best_beta?.toFixed(4)}
+                    {typeof result?.best_beta === "number"
+                      ? result.best_beta.toFixed(4)
+                      : "N/A"}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <Label>Best Gamma:</Label>
                   <span className="font-bold text-primary">
-                    {result?.best_gamma?.toFixed(4)}
+                    {typeof result?.best_gamma === "number"
+                      ? result.best_gamma.toFixed(4)
+                      : "N/A"}
                   </span>
                 </div>
               </div>
