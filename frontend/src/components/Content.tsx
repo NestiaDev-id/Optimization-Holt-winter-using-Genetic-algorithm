@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import React, { useTransition } from "react";
+import React, { useState, useTransition } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import { motion } from "framer-motion";
 import {
@@ -18,6 +18,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { Button } from "./ui/button";
+import { sendData } from "@/utils/store";
 
 const chartData = [
   { month: "Jan", national: 4000, international: 2400 },
@@ -53,6 +55,9 @@ export default function Content() {
   const [activeChart, setActiveChart] =
     React.useState<keyof typeof chartConfig>("national");
   const [isPending, startTransition] = useTransition();
+  const [forecastData, setForecastData] = useState<any[]>([]);
+
+  const [result, setResult] = useState<Record<string, unknown> | null>(null);
 
   const total = React.useMemo(
     () => ({
@@ -64,6 +69,79 @@ export default function Content() {
     }),
     []
   );
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    // Make this function async
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const generation = formData.get("generation")?.toString() || "";
+    const kromosom = formData.get("kromosom")?.toString() || "";
+    const probability = formData.get("probability")?.toString() || "";
+    try {
+      // Correctly access the backend URL using import.meta.env
+      const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+      const data = {
+        population_size: generation, // Kirim 'generations' sesuai format yang benar
+        generations: kromosom, // Kirim 'kromosom'
+        mutation_prob: probability, // Kirim 'mutation_prob'
+        dataset: [], // Kirim dataset sebagai array kosong jika memang kosong
+      };
+
+      const response = await fetch("/api/predict", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data), // Mengirim data dengan format JSON
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json(); // Menangani error jika status tidak OK
+        console.error("Error:", errorData);
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json(); // Parse the error response
+        console.error("Error:", errorData); // Log the error details
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      // Mengambil data JSON dari respon
+      console.log(data); // Log data untuk debugging
+
+      // Mengonversi forecast menjadi format chartData
+      const months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+
+      const responseData = await response.json(); // Parse the response JSON
+      const chartData = responseData.forecast.map(
+        (value: number, index: number) => ({
+          month: months[index],
+          national: value, // Atau sesuaikan jika kamu ingin memetakan ke 'international'
+          international: 0, // Bisa disesuaikan jika ada data lain
+        })
+      );
+      console.log("Chart Data:", chartData); // Log chart data untuk debugging
+      setForecastData(chartData);
+    } catch (error) {
+      console.error("Error sending data:", error);
+      throw error;
+    }
+  };
   return (
     <div className="container mx-auto mt-6 flex flex-col gap-6">
       <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -91,7 +169,9 @@ export default function Content() {
                       {chartConfig[chart].label}
                     </span>
                     <span className="text-lg font-bold leading-none sm:text-3xl">
-                      {total[key as keyof typeof total].toLocaleString()}
+                      {forecastData
+                        .reduce((acc, curr) => acc + curr[key], 0)
+                        .toLocaleString()}
                     </span>
                   </button>
                 );
@@ -100,12 +180,21 @@ export default function Content() {
           </CardHeader>
           <CardContent className="px-2 sm:p-6">
             <ChartContainer
-              config={chartConfig}
+              config={{
+                views: forecastData.map((data) => ({
+                  label: data.month,
+                  value: data.national,
+                })),
+              }}
               className="aspect-auto h-[250px] w-full"
             >
               <BarChart
                 accessibilityLayer
-                data={chartData}
+                data={forecastData.map((data) => ({
+                  month: data.month,
+                  national: data.national,
+                  international: data.international,
+                }))}
                 margin={{
                   left: 12,
                   right: 12,
@@ -140,7 +229,7 @@ export default function Content() {
 
         {/* Card Prediction (Nomor 4) */}
         <div className="flex flex-col gap-6">
-          <form action={""}>
+          <form onSubmit={handleSubmit}>
             <Card>
               <CardHeader>
                 <CardTitle>Genetic Algorithm</CardTitle>
@@ -179,6 +268,9 @@ export default function Content() {
                     disabled={isPending}
                   />
                 </div>
+                <Button className="w-full" type="submit" disabled={isPending}>
+                  Submit
+                </Button>
               </CardContent>
             </Card>
           </form>
