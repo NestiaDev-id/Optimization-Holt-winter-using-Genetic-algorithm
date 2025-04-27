@@ -12,7 +12,7 @@ app = FastAPI(
 )
 
 # Get FRONTEND_URL from environment
-frontend_url = os.getenv("FRONTEND_URL")
+frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,3 +29,7 @@ app.include_router(endpoints.router, prefix="/api")
 def read_root():
     return {"message": "Welcome to My ML API!"}
 
+# ! For development purposes only, remove in production
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
