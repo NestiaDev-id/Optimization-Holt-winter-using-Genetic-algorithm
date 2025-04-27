@@ -1,26 +1,15 @@
 import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
+import Content from "./components/Content";
+import Navbar from "./components/Navbar";
 
-function App() {
-  const [count, setCount] = useState(0);
-
+export default function App() {
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <div className="App">
-            <h1>Welcome to the App</h1>
-            <button onClick={() => setCount(count + 1)}>
-              Count is {count}
-            </button>
-          </div>
-        }
-      />
-      <Route path="/about" element={<div>About Page</div>} />
-      <Route path="/contact" element={<div>Contact Page</div>} />
-    </Routes>
+    <div className="min-h-screen bg-muted/50">
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Content />} />
+      </Routes>
+    </div>
   );
 }
-
-export default App;
