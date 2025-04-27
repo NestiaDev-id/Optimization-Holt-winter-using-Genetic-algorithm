@@ -11,7 +11,6 @@ data/
 # Ignore virtual environment (pastikan kamu tidak meng-upload venv)
 
 venv/
-\*venv
 
 # Ignore temporary files atau file cache
 
@@ -22,6 +21,7 @@ _.swp
 
 # Ignore Excel files (jika tidak perlu di-upload)
 
+\*.ipynb
 \*.xlsx
 
 # Ignore .git directory

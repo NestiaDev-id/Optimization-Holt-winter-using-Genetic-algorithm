@@ -20,6 +20,15 @@ import {
 } from "@/components/ui/chart";
 import { Button } from "./ui/button";
 import { sendData } from "@/utils/store";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"; // pastikan ini sudah ada ya
+import { Loader2 } from "lucide-react"; // import icon spinner
 
 const chartData = [
   { month: "Jan", national: 4000, international: 2400 },
@@ -43,19 +52,20 @@ const chartConfig = {
   },
   national: {
     label: "National",
-    color: "#00C49F",
+    color: "#4ADE80",
   },
   international: {
     label: "International",
-    color: "#0088FE",
+    color: "#60A5FA",
   },
 } satisfies ChartConfig;
 
 export default function Content() {
   const [activeChart, setActiveChart] =
     React.useState<keyof typeof chartConfig>("national");
-  const [isPending, startTransition] = useTransition();
+  // const [isPending, startTransition] = useTransition();
   const [forecastData, setForecastData] = useState<any[]>([]);
+  const [isPending, setIsPending] = useState(false);
 
   const [result, setResult] = useState<Record<string, unknown> | null>(null);
 
@@ -70,48 +80,53 @@ export default function Content() {
     []
   );
 
+  const formatNumber = (num: number) => {
+    if (num >= 1_000_000) {
+      return `${(num / 1_000_000).toFixed(2)} M`;
+    } else if (num >= 1_000) {
+      return `${(num / 1_000).toFixed(2)} rb`; // opsional kalau mau ada "rb"
+    } else {
+      return num.toLocaleString(); // angka kecil biasa
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    // Make this function async
     e.preventDefault();
+    setIsPending(true); // Mulai loading
+
     const formData = new FormData(e.currentTarget);
     const generation = formData.get("generation")?.toString() || "";
     const kromosom = formData.get("kromosom")?.toString() || "";
     const probability = formData.get("probability")?.toString() || "";
+
     try {
-      // Correctly access the backend URL using import.meta.env
       const backendUrl = import.meta.env.VITE_BACKEND_URL;
+      if (!backendUrl) {
+        throw new Error("Backend URL is not defined in environment variables.");
+      }
 
       const data = {
-        population_size: generation, // Kirim 'generations' sesuai format yang benar
-        generations: kromosom, // Kirim 'kromosom'
-        mutation_prob: probability, // Kirim 'mutation_prob'
-        dataset: [], // Kirim dataset sebagai array kosong jika memang kosong
+        population_size: generation,
+        generations: kromosom,
+        mutation_prob: probability,
+        dataset: [],
       };
 
-      const response = await fetch(`${backendUrl}/api/predict`, {
+      const response = await fetch(`${backendUrl}api/predict`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data), // Mengirim data dengan format JSON
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
-        const errorData = await response.json(); // Menangani error jika status tidak OK
+        const errorData = await response.json();
         console.error("Error:", errorData);
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
-      if (!response.ok) {
-        const errorData = await response.json(); // Parse the error response
-        console.error("Error:", errorData); // Log the error details
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      // Mengambil data JSON dari respon
-      console.log(data); // Log data untuk debugging
-
-      // Mengonversi forecast menjadi format chartData
+      const responseData = await response.json();
       const months = [
         "Jan",
         "Feb",
@@ -127,21 +142,26 @@ export default function Content() {
         "Dec",
       ];
 
-      const responseData = await response.json(); // Parse the response JSON
+      const forecast = responseData;
+      setResult(forecast);
+
       const chartData = responseData.forecast.map(
         (value: number, index: number) => ({
           month: months[index],
-          national: value, // Atau sesuaikan jika kamu ingin memetakan ke 'international'
-          international: 0, // Bisa disesuaikan jika ada data lain
+          national: value,
+          international: 0,
         })
       );
-      console.log("Chart Data:", chartData); // Log chart data untuk debugging
+
       setForecastData(chartData);
     } catch (error) {
       console.error("Error sending data:", error);
       throw error;
+    } finally {
+      setIsPending(false); // Selesai loading
     }
   };
+
   return (
     <div className="container mx-auto mt-6 flex flex-col gap-6">
       <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -169,9 +189,9 @@ export default function Content() {
                       {chartConfig[chart].label}
                     </span>
                     <span className="text-lg font-bold leading-none sm:text-3xl">
-                      {forecastData
-                        .reduce((acc, curr) => acc + curr[key], 0)
-                        .toLocaleString()}
+                      {formatNumber(
+                        forecastData.reduce((acc, curr) => acc + curr[key], 0)
+                      )}
                     </span>
                   </button>
                 );
@@ -220,7 +240,7 @@ export default function Content() {
                 />
                 <Bar
                   dataKey={activeChart}
-                  fill={`var(--color-${activeChart})`}
+                  fill={chartConfig[activeChart].color}
                 />
               </BarChart>
             </ChartContainer>
@@ -269,7 +289,11 @@ export default function Content() {
                   />
                 </div>
                 <Button className="w-full" type="submit" disabled={isPending}>
-                  Submit
+                  {isPending ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    "Submit"
+                  )}
                 </Button>
               </CardContent>
             </Card>
@@ -278,17 +302,34 @@ export default function Content() {
           {/* Text Area Diagnosis Info (Nomor 8) */}
           <Card>
             <CardHeader>
-              <CardTitle>Diagnosis: Glaucoma</CardTitle>
+              <CardTitle>Model Performance</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
-                <Label>What is it?</Label>
-                <Textarea
-                  className="resize-none"
-                  rows={4}
-                  value="Glaucoma is a group of eye conditions that damage the optic nerve, which connects the eye to the brain..."
-                  readOnly
-                />
+              <div className="space-y-4">
+                <div className="flex justify-between">
+                  <Label>MAPE (Error):</Label>
+                  <span className="font-bold text-primary">
+                    {result?.mape?.toFixed(2)}%
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <Label>Best Alpha:</Label>
+                  <span className="font-bold text-primary">
+                    {result?.best_alpha?.toFixed(4)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <Label>Best Beta:</Label>
+                  <span className="font-bold text-primary">
+                    {result?.best_beta?.toFixed(4)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <Label>Best Gamma:</Label>
+                  <span className="font-bold text-primary">
+                    {result?.best_gamma?.toFixed(4)}
+                  </span>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -299,18 +340,27 @@ export default function Content() {
       <div className="flex flex-col p-6 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Diagnosis: Glaucoma</CardTitle>
+            <CardTitle>Forecast Results</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <Label>What is it?</Label>
-              <Textarea
-                className="resize-none"
-                rows={4}
-                value="Glaucoma is a group of eye conditions that damage the optic nerve, which connects the eye to the brain..."
-                readOnly
-              />
-            </div>
+          <CardContent className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>No</TableHead>
+                  <TableHead>Bulan</TableHead>
+                  <TableHead>Hasil Prediksi</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {forecastData.map((data, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{data.month}</TableCell>
+                    <TableCell>{data.national.toLocaleString()}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
       </div>
