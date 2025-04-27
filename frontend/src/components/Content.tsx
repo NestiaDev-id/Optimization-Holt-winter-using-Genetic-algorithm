@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import React, { useTransition } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
-
+import { motion } from "framer-motion";
 import {
   ChartConfig,
   ChartContainer,
@@ -20,17 +20,17 @@ import {
 } from "@/components/ui/chart";
 
 const chartData = [
-  { month: "January", national: 4000, international: 2400 },
-  { month: "February", national: 3000, international: 1398 },
-  { month: "March", national: 2000, international: 9800 },
-  { month: "April", national: 2780, international: 3908 },
+  { month: "Jan", national: 4000, international: 2400 },
+  { month: "Feb", national: 3000, international: 1398 },
+  { month: "Mar", national: 2000, international: 9800 },
+  { month: "Apr", national: 2780, international: 3908 },
   { month: "May", national: 1890, international: 4800 },
-  { month: "Juny", national: 2390, international: 3800 },
-  { month: "July", national: 2390, international: 3800 },
-  { month: "August", national: 2390, international: 3800 },
-  { month: "September", national: 2390, international: 3800 },
-  { month: "November", national: 2390, international: 3800 },
-  { month: "December", national: 2390, international: 3800 },
+  { month: "Jun", national: 2390, international: 3800 },
+  { month: "Jul", national: 2390, international: 3800 },
+  { month: "Aug", national: 2390, international: 3800 },
+  { month: "Sep", national: 2390, international: 3800 },
+  { month: "Nov", national: 2390, international: 3800 },
+  { month: "Dec", national: 2390, international: 3800 },
 ];
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
@@ -73,7 +73,7 @@ export default function Content() {
           <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
             <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6 xl:text-center">
               <CardTitle>Passager prediction at Soekarno-Hatta</CardTitle>
-              <CardDescription className="text-sm text-muted-foreground sm:hidden">
+              <CardDescription className="text-sm text-muted-foreground sm:hidden ">
                 Showing total visitors for the next 12 months at 2023
               </CardDescription>
             </div>
