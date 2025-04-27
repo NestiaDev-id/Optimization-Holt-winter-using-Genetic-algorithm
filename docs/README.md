@@ -31,6 +31,11 @@ Proyek ini bertujuan untuk melakukan optimisasi pada model peramalan Holt-Winter
 
 4. **Langkah-langkah Pengolahan Data**
 
+5. \*\*Untuk menjalankan app pada tahap development
+   ```bash
+   uvicorn app.main:app --reload
+   ```
+
 ## Structure Project
 
 ```📂 ml-project/
