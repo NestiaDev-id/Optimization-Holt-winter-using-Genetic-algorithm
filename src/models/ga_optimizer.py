@@ -312,7 +312,7 @@ def algoritma_genetika6(train, test,  jumlahKromosom, generations, probability):
             no_improvement_count += 1
 
         # Hapus dan tambahkan individu baru jika tidak ada perbaikan
-        if no_improvement_count >= 5:
+        if no_improvement_count >= 12:
             print("Tidak ada perbaikan, menghapus individu dan menambahkan individu secara acak.")
 
             # Elitisme - simpan top individu
