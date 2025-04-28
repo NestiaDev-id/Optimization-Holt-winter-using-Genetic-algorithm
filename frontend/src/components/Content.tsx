@@ -144,8 +144,8 @@ export default function Content() {
       }
 
       const data = {
-        generations: generation,
-        population_size: kromosom,
+        population_size: generation,
+        generations: kromosom,
         mutation_prob: probability,
         dataset: [],
       };
