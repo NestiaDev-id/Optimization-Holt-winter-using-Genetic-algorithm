@@ -13,7 +13,6 @@ import React, { useState } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 // import { motion } from "framer-motion";
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
@@ -47,24 +46,26 @@ import { Loader2 } from "lucide-react"; // import icon spinner
 // const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const chartConfig = {
-  views: {
-    label: "Page Views",
-  },
   national: {
     label: "National",
-    color: "#4ADE80",
+    color: "#00C49F", // Color for the 'national' chart
   },
   international: {
     label: "International",
-    color: "#60A5FA",
+    color: "#0088FE", // Color for the 'international' chart
   },
-} satisfies ChartConfig;
+};
+type ForecastData = {
+  month: string;
+  national: number;
+  international: number;
+};
 
 export default function Content() {
   const [activeChart, setActiveChart] =
     React.useState<keyof typeof chartConfig>("national");
   // const [isPending, startTransition] = useTransition();
-  const [forecastData, setForecastData] = useState<any[]>([]);
+  const [forecastData, setForecastData] = useState<ForecastData[]>([]);
   const [isPending, setIsPending] = useState(false);
 
   const [result, setResult] = useState<{
@@ -93,6 +94,22 @@ export default function Content() {
     } else {
       return num.toLocaleString(); // angka kecil biasa
     }
+  };
+
+  const THEMES = {
+    light: "#FFFFFF", // Example color for light theme
+    dark: "#000000", // Example color for dark theme
+  };
+
+  const config = {
+    views: forecastData.map((data) => {
+      const color = chartConfig[activeChart]?.color || "transparent";
+      return {
+        label: data.month || "Unknown Month", // Always set a fallback label
+        // If color exists, add color, else add theme (but not both)
+        ...(color ? { color } : { theme: THEMES.light }), // Adjust `THEMES.light` to your needs
+      };
+    }),
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -154,7 +171,7 @@ export default function Content() {
         (value: number, index: number) => ({
           month: months[index],
           national: value,
-          international: 0,
+          international: 0, // You can adjust this as needed
         })
       );
 
@@ -195,7 +212,7 @@ export default function Content() {
                     </span>
                     <span className="text-lg font-bold leading-none sm:text-3xl">
                       {formatNumber(
-                        forecastData.reduce((acc, curr) => acc + curr[key], 0)
+                        forecastData.reduce((acc, curr) => acc + curr[chart], 0)
                       )}
                     </span>
                   </button>
@@ -205,12 +222,7 @@ export default function Content() {
           </CardHeader>
           <CardContent className="px-2 sm:p-6">
             <ChartContainer
-              config={{
-                views: forecastData.map((data) => ({
-                  label: data.month,
-                  color: chartConfig.national.color, // Add a valid color property
-                })),
-              }}
+              config={config}
               className="aspect-auto h-[250px] w-full"
             >
               <BarChart
