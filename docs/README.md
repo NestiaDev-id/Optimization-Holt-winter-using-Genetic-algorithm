@@ -34,6 +34,7 @@ Proyek ini bertujuan untuk melakukan optimisasi pada model peramalan Holt-Winter
 5. \*\*Untuk menjalankan app pada tahap development
    ```bash
    uvicorn app.main:app --reload
+   uvicorn app.main:app --host=0.0.0.0 --port=3000 --reload
    ```
 
 ## Structure Project
