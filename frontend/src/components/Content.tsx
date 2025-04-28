@@ -96,21 +96,37 @@ export default function Content() {
     }
   };
 
-  const THEMES = {
-    light: "#FFFFFF", // Example color for light theme
-    dark: "#000000", // Example color for dark theme
-  };
+  // const config = {
+  //   // Menggunakan forecastData untuk membangun data chart
+  //   views: forecastData.reduce((acc, data) => {
+  //     // Menambahkan objek untuk setiap bulan yang ada di forecastData
+  //     acc[data.month] = {
+  //       label: data.month, // Label untuk setiap bulan
+  //       color: getColorForMonth(data.month), // Menggunakan fungsi untuk menentukan warna berdasarkan bulan
+  //     };
+  //     return acc;
+  //   }, {}),
+  // };
 
-  const config = {
-    views: forecastData.map((data) => {
-      const color = chartConfig[activeChart]?.color || "transparent";
-      return {
-        label: data.month || "Unknown Month", // Always set a fallback label
-        // If color exists, add color, else add theme (but not both)
-        ...(color ? { color } : { theme: THEMES.light }), // Adjust `THEMES.light` to your needs
-      };
-    }),
-  };
+  // // Fungsi untuk menentukan warna berdasarkan bulan
+  // const getColorForMonth = (month) => {
+  //   switch (month) {
+  //     case "Jan":
+  //       return "#FF5733"; // Contoh warna untuk Januari
+  //     case "Feb":
+  //       return "#33FF57"; // Contoh warna untuk Februari
+  //     case "Mar":
+  //       return "#3357FF"; // Contoh warna untuk Maret
+  //     case "Apr":
+  //       return "#57FF33"; // Contoh warna untuk April
+  //     case "May":
+  //       return "#33A1FF"; // Contoh warna untuk Mei
+  //     case "Jun":
+  //       return "#A133FF"; // Contoh warna untuk Juni
+  //     default:
+  //       return "#CCCCCC"; // Default color jika bulan tidak ditemukan
+  //   }
+  // };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -128,8 +144,8 @@ export default function Content() {
       }
 
       const data = {
-        population_size: generation,
-        generations: kromosom,
+        generations: generation,
+        population_size: kromosom,
         mutation_prob: probability,
         dataset: [],
       };
@@ -222,7 +238,32 @@ export default function Content() {
           </CardHeader>
           <CardContent className="px-2 sm:p-6">
             <ChartContainer
-              config={config}
+              config={{
+                Jan: {
+                  label: "January",
+                  color: "#FF5733", // Contoh warna untuk Januari
+                },
+                Feb: {
+                  label: "February",
+                  color: "#33FF57", // Contoh warna untuk Februari
+                },
+                Mar: {
+                  label: "March",
+                  color: "#3357FF", // Contoh warna untuk Maret
+                },
+                Apr: {
+                  label: "April",
+                  color: "#57FF33", // Contoh warna untuk April
+                },
+                May: {
+                  label: "May",
+                  color: "#33A1FF", // Contoh warna untuk Mei
+                },
+                Jun: {
+                  label: "June",
+                  color: "#A133FF", // Contoh warna untuk Juni
+                },
+              }}
               className="aspect-auto h-[250px] w-full"
             >
               <BarChart
