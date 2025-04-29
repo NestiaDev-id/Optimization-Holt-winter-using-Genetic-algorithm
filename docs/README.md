@@ -21,7 +21,23 @@ Proyek ini bertujuan untuk melakukan optimisasi pada model peramalan Holt-Winter
 ┃     ┣━━ 📄 02-feature-engineering.ipynb
 ┃     ┣━━ 📄 03-model-training.ipynb
 ┃     ┗━━ 📄 04-model-evaluation.ipynb
-
+┃
+┃━━ 📂 app/ → For backend route using fast api
+┃     ┣━━ 📂 api → Route handling
+┃           ┣━━ 📄 endpoints.py
+┃     ┣━━ 📂 core
+┃     ┣━━ 📂 core
+┃     ┣━━ 📂 models → Data models
+┃           ┣━━ 📄 data_model.py
+┃     ┣━━ 📂 services → For service predict passager
+┃           ┣━━ 📄 model_service
+┃     ┣━━ 📄 main.py
+┃
+┃━━ 📂 frontend/ → React-Vite-Tyscript
+┃     ┣━━ 📂 src
+┃     ┣━━ 📂 public
+┃     ┣━━ 📄 Readme.md
+┃
 ┣━━ 📂 src/ → Modular Python scripts
 ┃     ┣━━ 📂 data/ → Data handling
 ┃     ┃     ┣━━ 📄 load_data.py
@@ -30,9 +46,9 @@ Proyek ini bertujuan untuk melakukan optimisasi pada model peramalan Holt-Winter
 ┃     ┣━━ 📂 features/ → Feature engineering
 ┃     ┃     ┗━━ 📄 feature_selection.py
 ┃     ┣━━ 📂 models/ → Model training and prediction
-┃     ┃     ┣━━ 📄 train_model.py
-┃     ┃     ┣━━ 📄 predict.py
-┃     ┃     ┗━━ 📄 evaluate.py
+┃     ┃     ┣━━ 📄 evaluate.py
+┃     ┃     ┣━━ 📄 ga_optimizer.py
+┃     ┃     ┗━━ 📄 holt_winter.py
 ┃     ┣━━ 📂 visualizations/ → Data visualization
 ┃     ┃     ┗━━ 📄 plot_results.py
 
