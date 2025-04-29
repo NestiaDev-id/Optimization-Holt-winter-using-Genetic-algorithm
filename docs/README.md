@@ -8,35 +8,6 @@ Proyek ini bertujuan untuk melakukan optimisasi pada model peramalan Holt-Winter
 - Prediksi jumlah penumpang pesawat di Bandara Soekarno-Hatta
 - Penggunaan dataset riil untuk peramalan
 
-## Instalasi
-
-1. **Clone repositori ini:**
-
-   ```bash
-   git clone https://github.com/username/optimisasi-holt-winter-genetic-algorithm.git
-   cd optimisasi-holt-winter-genetic-algorithm
-   ```
-
-2. **Buat environment Python baru:**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # Untuk Linux/MacOS
-   venv\Scripts\activate     # Untuk Windows
-   ```
-3. **Instal dependensi yang diperlukan:**
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Langkah-langkah Pengolahan Data**
-
-5. \*\*Untuk menjalankan app pada tahap development
-   ```bash
-   uvicorn app.main:app --reload
-   uvicorn app.main:app --host=0.0.0.0 --port=3000 --reload
-   ```
-
 ## Structure Project
 
 ```📂 ml-project/
@@ -81,3 +52,48 @@ Proyek ini bertujuan untuk melakukan optimisasi pada model peramalan Holt-Winter
 ┣━━ 📄 .gitignore
 ┗━━ 📄 LICENSE
 ```
+
+## Instalasi
+
+1. **Clone repositori ini:**
+
+   ```bash
+   git clone https://github.com/username/optimisasi-holt-winter-genetic-algorithm.git
+   cd optimisasi-holt-winter-genetic-algorithm
+   ```
+
+2. **Buat environment Python baru:**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Untuk Linux/MacOS
+   venv\Scripts\activate     # Untuk Windows
+   ```
+3. **Instal dependensi yang diperlukan:**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Langkah-langkah Pengolahan Data**
+
+- Menghapus kolom yang tidak digunakan
+- Mengisi nilai yang kosong (NaN) dengan nilai rata-rata
+- Menghapus duplikasi pada data yang digunakan
+- Deteksi dan hapus outlier menggunakan IQR kemudian nilai yang dihapus akan digantikan dengan nilai rata-rata dari data yang digunakan
+
+6. ** Metode AG-HW **
+
+- Inisialisai populasi
+- Pembentukan populasi baru
+- Menghitung nilai fitness
+- Seleksi orang tua menggunakan Roullete Wheel
+- Crossover atau mutasi
+- Elitisme (Mempertahankan individu terbaik)
+- Uji evaluasi Fitness menggunakan MAPE
+- Pembentukan populasi baru (Replacement)
+
+7. **Untuk menjalankan app pada tahap development **
+   ```bash
+   uvicorn app.main:app --reload
+   uvicorn app.main:app --host=0.0.0.0 --port=3000 --reload
+   ```
