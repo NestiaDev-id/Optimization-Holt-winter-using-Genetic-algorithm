@@ -4,19 +4,20 @@ from app.api import endpoints
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
 
 app = FastAPI(
     title="My ML API",
     description="Backend untuk ML model serving",
     version="0.1.0",
 )
-
+load_dotenv()
 # Get FRONTEND_URL from environment
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[frontend_url] if frontend_url else ["*"],  # Allow specific frontend URL or all origins
+    allow_origins=[frontend_url, "https://passager-ga-hw.vercel.app"],  # Allow specific frontend URL or all origins
     allow_credentials=True,
     allow_methods=["*"],  
     allow_headers=["*"],
