@@ -369,17 +369,16 @@ export default function Content() {
                   <span className="font-bold text-primary">
                     {typeof result?.mape === "number"
                       ? result.mape.toFixed(2)
-                      : "N/A"}
+                      : "0"}
                     %
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <Label>Best Alpha:</Label>
                   <span className="font-bold text-primary">
-                    {typeof result?.mape === "number"
-                      ? result.mape.toFixed(2)
-                      : "N/A"}
-                    %
+                    {typeof result?.best_alpha === "number"
+                      ? result.best_alpha.toFixed(4)
+                      : "0"}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -387,7 +386,7 @@ export default function Content() {
                   <span className="font-bold text-primary">
                     {typeof result?.best_beta === "number"
                       ? result.best_beta.toFixed(4)
-                      : "N/A"}
+                      : "0"}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -395,7 +394,7 @@ export default function Content() {
                   <span className="font-bold text-primary">
                     {typeof result?.best_gamma === "number"
                       ? result.best_gamma.toFixed(4)
-                      : "N/A"}
+                      : "0"}
                   </span>
                 </div>
               </div>

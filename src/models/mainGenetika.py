@@ -35,7 +35,6 @@ def pembentukan_populasi_awal(jumlahKromosom):
             })
     return biner
 
-
 def Tournament(populasi, k=None):
     # Jika k tidak diberikan, set k sebagai 2 untuk memilih 2 individu acak
     if k is None:
@@ -74,7 +73,6 @@ def RankSelection(populasi):
         if r <= cumulative_probability:
             return populasi_terurut[i]
 
-
 def RouletteWhell(populasi):
     fitness_balik = []
     fitness_relatif = []
@@ -109,7 +107,6 @@ def RouletteWhell(populasi):
     for i, cumulative_probability in enumerate(fitness_kumulatif):
         if r1 <= cumulative_probability:
             return populasi[i]
-
 
 def uniform_crossover(train, test, parent1, parent2):
     # print("Parent1:",parent1)
