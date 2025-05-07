@@ -405,25 +405,43 @@ export default function Content() {
 
       {/* Card Prediction (Nomor 5) */}
       <div className="flex flex-col p-6 gap-6">
+        {/* Card Prediction (Nomor 5) */}
         <Card>
-          <CardHeader>
-            <CardTitle>Forecast Results</CardTitle>
+          <CardHeader className="flex flex-col items-start border-b p-0 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col px-6 py-5 sm:py-6">
+              <CardTitle className="text-xl font-semibold white:text-gray-800 black:text-white">
+                Forecast Results
+              </CardTitle>
+              <CardDescription className="text-sm text-muted-foreground">
+                Passenger prediction for the next 12 months in 2023
+              </CardDescription>
+            </div>
           </CardHeader>
-          <CardContent className="overflow-x-auto">
+
+          <CardContent className="overflow-x-auto px-2 sm:px-6 sm:pb-6">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>No</TableHead>
-                  <TableHead>Bulan</TableHead>
-                  <TableHead>Hasil Prediksi</TableHead>
+                  <TableHead className="text-center w-12">No</TableHead>
+                  <TableHead className="text-center">Bulan</TableHead>
+                  <TableHead className="text-center">Hasil Prediksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {forecastData.map((data, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>{data.month}</TableCell>
-                    <TableCell>{data.national.toLocaleString()}</TableCell>
+                  <TableRow
+                    key={index}
+                    className={index % 2 === 0 ? "bg-muted/20" : ""}
+                  >
+                    <TableCell className="text-center font-medium text-muted-foreground">
+                      {index + 1}
+                    </TableCell>
+                    <TableCell className="text-center font-medium text-gray-700">
+                      {data.month}
+                    </TableCell>
+                    <TableCell className="text-center font-semibold text-gray-900">
+                      {data.national.toLocaleString("id-ID")}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
