@@ -1,6 +1,6 @@
 # app/main.py
 from fastapi import FastAPI
-from app.api.endpoints import endpoints
+from app.api import endpoints
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
