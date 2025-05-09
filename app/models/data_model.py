@@ -9,7 +9,6 @@ class PredictionInput(BaseModel):
     population_size: int
     generations: int
     mutation_prob: int
-    dataset: List[DataPoint]
 
 class PredictionResult(BaseModel):
     forecast: List[float]
