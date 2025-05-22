@@ -138,7 +138,7 @@ export default function Content() {
     const probability = formData.get("probability")?.toString() || "";
 
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL;
+      const backendUrl = "http://127.0.0.1:8000/";
       if (!backendUrl) {
         throw new Error("Backend URL is not defined in environment variables.");
       }
