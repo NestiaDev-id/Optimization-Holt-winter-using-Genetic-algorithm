@@ -6,7 +6,6 @@ _.h5
 # Ignore data file yang besar
 
 notebooks/
-data/
 
 # Ignore virtual environment (pastikan kamu tidak meng-upload venv)
 
