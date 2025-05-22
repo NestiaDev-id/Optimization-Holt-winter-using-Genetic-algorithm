@@ -1,28 +1,25 @@
 # app/main.py
 from fastapi import FastAPI
-from app.api import endpoints
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
 
 app = FastAPI(
-    title="My ML API",
-    description="Backend untuk ML model serving",
-    version="0.1.0",
+    title="Defense System Helper - Python Backend",
+    description="Quantum-Safe Security Implementation",
+    version="1.0.0",
+    root_path="/api/",
 )
+
 load_dotenv()
-# Get FRONTEND_URL from environment
-frontend_url = os.getenv("http://localhost:5173","FRONTEND_URL")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Allow specific frontend URL or all origins
+    allow_origins=["CORS_ORIGIN", "http://localhost:5173"],  # Allow specific frontend URL or all origins
     allow_credentials=True,
     allow_methods=["*"],  
     allow_headers=["*"],
 )
-
-app.include_router(endpoints.router, prefix="/api")
 
 @app.get("/")
 def read_root():
