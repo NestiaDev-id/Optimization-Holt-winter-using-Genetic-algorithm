@@ -15,7 +15,7 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",    
+      "src": "/api/V1/(.*)",    
       "dest": "app/main.py"
     },
     {
